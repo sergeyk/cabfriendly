@@ -1,0 +1,11 @@
+	<p><strong>Depart Time: </strong><span id="{{ ride.id }}"></span></h3>
+	<p><strong>Meet Dist:</strong> {{ ride.start_distance|floatformat:2 }} mi.</p>
+	<p><strong>Dest Diff:</strong> {{ ride.end_distance|floatformat:2 }} mi.</p>
+	<p style="white-space: normal;"><strong>Description:</strong> {{ ride.description }}</p>
+	<p><strong>Number of people:</strong> {{ride.num_people}}</p>
+	<p><strong>Posted by:</strong> {{ride.poster.first_name}}</p>
+	<script type="text/javascript">
+	  document.getElementById("{{ ride.id }}").innerHTML=convertTZ("{{ride.start_time|date:'F d, Y H:i:s'}} UTC");
+	</script>
+	<span class="ui-li-count">{{ ride.num_people }}</span>
+	

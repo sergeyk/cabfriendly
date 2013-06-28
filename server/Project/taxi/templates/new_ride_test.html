@@ -1,0 +1,48 @@
+{% block content %}
+
+{% if rr_form.subject.errors %}
+    <ol>
+    {% for error in rr_form.subject.errors %}
+        <li><strong>{{ error|escape }}</strong></li>
+    {% endfor %}
+    </ol>
+{% endif %}
+
+<form method="POST" id="" action="/rides/request_test">{% csrf_token %}
+  <p><label for="start_lat"> Start latitude:
+      <input type="text" name="start_lat" value="2"/>
+  </label></p>
+  <p><label for="start_long"> Start longitude:
+      <input type="text" name="start_long" value="2"/>
+  </label></p>
+
+  <p><label for="end_lat"> End latitude:
+      <input type="text" name="end_lat" value="2"/>
+  </label></p>
+  <p><label for="end_long"> End longitude:
+      <input type="text" name="end_long" value="2"/>
+  </label></p>
+
+
+  <!-- Correct format for time is here//-->
+  <p><label for="start_time"> Start time
+      <input type="text" name="start_time" value="2012-12-01 03:30:30"/>
+  </label></p>
+
+  <p><label for="expiration_time"> Expiration time
+      <input type="text" name="expiration_time" value="2012-12-01 04:30:30"/>
+  </label></p>
+
+  <p><label for="num_people"> 
+      <input type="hidden" name="num_people" value="1"/>
+  </label></p>
+  
+  
+  <p><label for="wait_hr"> Wait hr
+      <input type="text" name="wait_hr" value="3"/>
+  </label></p>
+
+  <input type="submit" value="Submit" />
+</form>
+
+{% endblock %}

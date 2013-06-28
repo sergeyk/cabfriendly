@@ -1,0 +1,5 @@
+<li><a href="http://m.facebook.com/profile.php?id={{ req.user.get_profile.facebook_id }}">
+<img src="http://graph.facebook.com/{{ req.user.get_profile.facebook_id }}/picture?type=large" />
+<h1>{{req.user.first_name}} {{req.user.last_name}}</h1>
+<span class="ui-li-count">{{ req.num_people }}</span>
+</a></li>

@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block script %}
+<script type="text/javascript">
+$(function(){
+    // Remove the # from the hash, as different browsers may or may not include it
+    // http://stackoverflow.com/questions/5928435/append-remove-anchor-name-from-current-url-without-refresh
+    var hash = location.hash.replace('#','');
+
+    if(hash != ''){
+        // Show the hash if it's set
+
+        // Clear the hash in the URL
+        location.hash = '';
+    }
+});
+</script>
+{% endblock %}
+
+{% block body %}
+  <div id="main_page" data-role="page">
+	<div data-role="header" data-position="inline"><h1><img src="{{ STATIC_URL }}logo_inline.png"/><br>CabFriendly</h1></div>
+	<div class="content-primary">
+	<ul data-role="listview">
+	  <li>
+		<img src="http://graph.facebook.com/{{ user.get_profile.facebook_id }}/picture?type=large" />
+		<h3>Welcome {{user.first_name}}!</h3>
+	  </li>
+      {% if messages %}
+        {% for message in messages %}
+            <li>
+                {{ message|safe }}
+            </li>
+        {% endfor %}
+      {% endif %}
+	</ul>
+	<a href="/rides/request/" rel="external" data-icon="search" data-role="button"  data-iconpos="right" data-theme="b">Search for New Ride</a>	
+	<a href="/rides/current/" rel="external" data-role="button">View My Current Rides</a>
+	<a href="{{ STATIC_URL }}about.html" data-role="button" data-icon="info" data-iconpos="right">About</a>
+ 	<a href="/facebook/logout/" rel="external" data-role="button">Logout</a>
+  </div>
+  </div>
+{% endblock %}

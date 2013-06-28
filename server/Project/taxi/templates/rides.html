@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block body %}
+  <div data-role="page">
+  <div data-role="header" data-position="inline"><h1 id="text">Current Rides</h1><a href="/" data-icon="home" data-iconpos="notext" data-direction="reverse" class="ui-btn-left jqm-home">Home</a></div>
+  <div data-role="content">
+  <div class="content-primary">	
+
+
+
+  <ul data-role="listview">
+    {% if messages %}
+    {% for message in messages %}
+    <li>
+      {{ message|safe }}
+    </li>
+    {% endfor %}
+    {% endif %}
+
+  {% if rides %}
+	  {% for ride in rides %}
+      <li><a href="/rides/{{ride.id}}/" rel="external">
+      <img src="http://graph.facebook.com/{{ ride.poster }}/picture?type=large" />
+	  {% include 'ride_partial.html' %}
+	  </a></li>
+    {% endfor %}
+  {% else %}
+    <li>Sorry, no matching rides exist!</li>
+  {% endif %}
+  {% if matching %}
+  <li><a href="/rides/new/" rel="external"><h3>Create new ride...</h3></a></li>
+  {% endif %}
+  </ul>
+
+  </div></div></div>
+{% endblock %}

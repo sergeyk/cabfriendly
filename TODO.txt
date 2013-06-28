@@ -1,0 +1,44 @@
+Mail notifications
+---
+[ ] hook up SES to Django and test sending shit-ton of messages
+?([ ] plot)
+?([ ] write up section about multi-threaded mail service [when to start new threads, etc.])
+
+Performance testing
+---
+[ ] finish the test client [must be able to search for rides, add new rides, and join rides, from fake FB accounts]
+  [ ] worst-case scenario is everyone submits the exact same request
+  [ ] best-case scenario is everyone submits completely random requests
+[ ] generate the response time vs. # concurrent requests per minute plot
+	[ ] find out how to log response times
+	[ ] logic for randomizing the requests
+[ ] generate the response time vs. # of instances
+	[ ] script to spin up extra instances and attach to load balancer
+
+Searching for rides
+---
+[ ] write test cases for the matching rides finder
+	[ ] finish matching rides logic
+[ ] handle race conditions when joining a ride: simply check for number of people in the ride
+[ ] make it so that users cannot access expired rides they are not a part of (with test)
+[ ] write section about concurrency control of searching for and joining rides
+
+Chat
+---
+[ ] write section about the event-driven chat server
+[ ] have a now.js server up which can be accessed at xxx/chat/ride_hash/user_hash and persists to Redis
+
+Client
+---
+[ ] write up defense of web app (HTML5 stuff) over native app: portability while still getting the location information
+[ ] write up the Maps API and the form logic stuff
+
+Paper
+---
+[ ] write introduction
+
+Poster
+---
+[ ] generate all the client screenshots
+[ ] make a figure of the server instances
+[ ] make poster

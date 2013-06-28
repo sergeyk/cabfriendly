@@ -1,0 +1,145 @@
+[
+    {
+        "pk":1,
+        "model":"taxi.searchrequest",
+        "fields":{
+            "end_long":0.0,
+            "ride":1,
+            "start_long":0.0,
+            "start_lat":0.0,
+            "user":1,
+            "end_lat":0.0,
+            "submission_time":"2012-12-01",
+            "start_time":"2012-12-01 02:50:00",
+            "num_people":1,
+            "expiration_time":"2012-12-01 03:30:00"
+        }
+    },
+    {
+        "pk":2,
+        "model":"taxi.searchrequest",
+        "fields":{
+            "end_long":0.0,
+            "ride":1,
+            "start_long":0.0,
+            "start_lat":0.0,
+            "user":1,
+            "end_lat":0.0,
+            "submission_time":"2012-12-01",
+            "start_time":"2012-12-01 04:00:00",
+            "num_people":1,
+            "expiration_time":"2012-12-01 04:30:00"
+        }
+    },
+    {
+        "pk":3,
+        "model":"taxi.searchrequest",
+        "fields":{
+            "end_long":0.0,
+            "ride":2,
+            "start_long":0.0,
+            "start_lat":0.0,
+            "user":2,
+            "end_lat":0.0,
+            "submission_time":"2012-12-01",
+            "start_time":"2012-12-01 4:10",
+            "num_people":1,
+            "expiration_time":"2012-12-01 4:50",
+            "description":"I like rides."
+        }
+    },
+    {
+        "pk":4,
+        "model":"taxi.searchrequest",
+        "fields":{
+            "end_long":0.0,
+            "ride":3,
+            "start_long":0.0,
+            "start_lat":0.0,
+            "user":1,
+            "end_lat":0.0,
+            "submission_time":"2011-12-01",
+            "start_time":"2011-12-01 4:10",
+            "num_people":1,
+            "expiration_time":"2011-12-01 4:50",
+            "description":"I like rides."
+        }
+    },
+    {
+        "pk":1,
+        "model":"taxi.ride",
+        "fields":{}
+    },
+    {
+        "pk":2,
+        "model":"taxi.ride",
+        "fields":{}
+    },
+    {
+        "pk":3,
+        "model":"taxi.ride",
+        "fields":{}
+    },
+    {
+        "pk":1,
+        "model":"facebook.facebookprofile",
+        "fields":{
+            "access_token":"AAACLjXDv9MYBAHeYsWzN7dEwz3tb3qpQyFfQOTtZBtLvn0t421EZA6NIe5kovXQd26kSvZBJZBZBo4DtntFuRFr7bzKdaipn9wj7shnJEwAZDZD",
+            "user":1,
+            "facebook_id":292233
+        }
+    },
+    {
+        "pk":2,
+        "model":"facebook.facebookprofile",
+        "fields":{
+            "access_token":"AAACLjXDv9MYBAHeYsWzN7dEwz3tb3qpQyFfQOTtZBtLvn0t421EZA6NIe5kovXQd26kSvZBJZBZBo4DtntFuRFr7bzKdaipn9wj7shnJEwAZDZD",
+            "user":2,
+            "facebook_id":10720929
+        }
+    },
+    {
+        "pk":1,
+        "model":"auth.user",
+        "fields":{
+            "username":"292233",
+            "first_name":"Geoff",
+            "last_name":"Jeffreys",
+            "is_active":true,
+            "is_superuser":false,
+            "is_staff":false,
+            "last_login":"2011-12-01 16:17:16",
+            "groups":[
+
+            ],
+            "user_permissions":[
+
+            ],
+            "password":"!",
+            "email":"fake@mail.com",
+            "date_joined":"2011-12-01 16:17:16"
+        }
+    },
+    {
+        "pk":2,
+        "model":"auth.user",
+        "fields":{
+            "username":"10720929",
+            "first_name":"sergey",
+            "last_name":"karayev",
+            "is_active":true,
+            "is_superuser":false,
+            "is_staff":false,
+            "last_login":"2011-12-01 18:07:36",
+            "groups":[
+
+            ],
+            "user_permissions":[
+
+            ],
+            "password":"!",
+            "email":"sergeykarayev@gmail.com",
+            "date_joined":"2011-12-01 16:43:31"
+        }
+    }
+]

@@ -1,0 +1,34 @@
+!!!
+html
+  head
+    title= title
+    script(src='/nowjs/now.js')
+    script(src='http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js')
+    script(type='text/javascript')
+      $(document).ready(function(){
+        now.cachedMessages = function(messages){
+          var content = messages[0];
+          for (i = 1; i<messages.length; i++) {
+            message = messages[i];
+            content = content + "<br />" + message;
+          }
+          $("#messages").html(content);
+        }
+
+        now.receiveMessage = function(name, message){
+          $("#messages").append("<br>" + name + ": " + message);
+        }
+
+        $("#send-button").click(function(){
+          now.distributeMessage($("#text-input").val());
+          $("#text-input").val("");
+        });
+        
+        now.user_name = #{user_name};
+        now.ride_id = #{ride_id};
+      });
+  body
+    #messages
+    | <input type="text" id="text-input">
+    | <input type="button" value="Send" id="send-button">
+

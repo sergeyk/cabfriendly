@@ -1,0 +1,258 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>RideFriendly: Ride Search</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<link rel="stylesheet" href="http://code.jquery.com/mobile/latest/jquery.mobile.min.css" />
+    	<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?key=AIzaSyBOOrquA1VgO0q7myJdu2FBEJeZF6NJJ90&sensor=true"></script>
+		<script type="text/javascript" charset="utf-8" src="http://code.jquery.com/jquery-1.6.2.min.js"></script>
+		<script type="text/javascript" charset="utf-8" src="http://code.jquery.com/mobile/latest/jquery.mobile.min.js"></script>
+		<style type="text/css">
+    h3 {
+        text-align: center;
+    }
+</style>
+
+    <script type="text/javascript">
+	  var state = 0;
+
+	  var start_marker = null;
+	  var start_image = 'green_MarkerA.png'
+	  var end_marker = null;
+	  var end_image = 'red_MarkerB.png'
+
+	  var map = null;
+	  
+	
+	  function drop_start(pos)
+	  {
+		if (start_marker)
+		{
+			start_marker.setPosition(pos);
+		}
+		else
+		{
+			start_marker = new google.maps.Marker({
+			position: pos,
+			map: map,
+			icon: start_image,
+			title: "Start" });
+		}
+	  }
+
+	  function drop_end(pos)
+	  {
+		if (end_marker)
+		{
+			end_marker.setPosition(pos);
+		}
+		else
+		{
+			end_marker = new google.maps.Marker({
+			position: pos,
+			map: map,
+			icon: end_image,
+			title: "End" });
+			$('#btn_mapnext').button('enable');	
+		}
+	  }
+
+       function load_map() {
+      	
+		var noPOILabels =
+			[{ 
+			  featureType: "poi", 
+			  elementType: "labels", 
+			  stylers: [ { visibility: "off" } ] 
+			}];
+		
+		var noPOIMapType = new google.maps.StyledMapType(noPOILabels, {name: "NO POI"});
+				
+        var mapOptions = 
+        {
+          zoom: 15,
+          continuousZoom: true,
+		  mapTypeIds: [google.maps.MapTypeId.ROADMAP, 'no_poi']
+        };
+        
+        map = new google.maps.Map(document.getElementById('map_canvas'), mapOptions);
+
+	 	map.mapTypes.set('no_poi', noPOIMapType);
+  		map.setMapTypeId('no_poi');
+
+        // Try HTML5 geolocation
+        if(navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(function(position) {
+            var pos = new google.maps.LatLng(position.coords.latitude,
+                                             position.coords.longitude);
+
+			drop_start(pos)
+
+            map.setCenter(pos);
+          });
+        }  
+        
+        google.maps.event.addListener(map, 'click', function(event){ if (state==1) { drop_start(event.latLng) } else if (state==2) { drop_end(event.latLng) }});
+
+      }
+      
+      function clickNext()
+ 	  {
+		state += 1;
+ 	  	changeState();
+ 	  }
+      
+      function clickTimeNext()
+ 	  {
+		$.mobile.changePage( $("#map_page"))
+ 	  	state += 1;
+ 	  	changeState();
+ 	  }
+      
+      function clickBack()
+ 	  {
+ 	  	if (state == 1)
+ 	  	{
+ 	  		$.mobile.changePage( $("#time_page"), "slide", true, true )
+ 	  	}
+ 	  	state -= 1;
+ 	  	changeState();
+ 	  }
+	
+ 	  function changeState()
+ 	  {
+ 	  	if (state == 1)
+ 	  	{	
+ 	  		if (!map)
+ 	  		{
+ 	  			load_map();
+ 	  		}
+ 	  		map.setZoom(15);
+ 	  		if (start_marker)
+ 	  		{
+ 	  			map.panTo(start_marker.getPosition());
+ 	  		} 	 	
+ 	  		$('#btn_mapnext').button('enable');	
+ 	  		document.getElementById("text").innerHTML="Tap desired <b>start</b> location";
+ 	  	}
+ 	  	else if (state == 2)
+ 	  	{
+ 	  		map.setZoom(13);
+ 	  		if (end_marker)
+ 	  		{	
+ 	  			map.panTo(end_marker.getPosition());
+ 	  		}
+ 	  		else
+ 	  		{
+ 	  			$('#btn_mapnext').button('disable');	
+ 	  		}
+			document.getElementById("text").innerHTML="Tap desired <b>end</b> location";
+ 	  	}
+ 	  }
+		$(document).ready(function(){
+			$('#map_page').height($(window).height());
+			$('#time_page').height($(window).height());
+			$('#map_canvas').height($(window).height() * 0.8);
+			$('#time').height($(window).height() * 0.8);
+
+			var now = new Date();
+			var hr = now.getHours();
+			var min = now.getMinutes();
+			
+			min = (5-min%5) + min
+			if (min == 60)
+			{
+				min = 0;
+				hr += 1;
+			}
+			
+			var hrselect = $("#wait-hr");
+			var minselect = $("#wait-min");			
+			var meridiemselect = $("#wait-meridiem");
+			
+			if (hr > 11)
+			{
+				hrselect[0].selectedIndex = hr-13;
+				meridiemselect[0].selectedIndex = 1;
+			}
+			else
+			{
+				hrselect[0].selectedIndex = hr-1;
+			}
+			minselect[0].selectedIndex = min/5;
+			minselect.selectmenu("refresh");
+			hrselect.selectmenu("refresh");
+			meridiemselect.selectmenu("refresh");
+			
+			
+		});
+	</script>
+	
+  </head>
+  <body>
+
+  <div id="time_page" data-role="page">
+	<div data-role="header" data-position="inline"><div><h3>Select desired ride time</h3></div></div>
+	<div id="time" data-role="content">
+	
+	<label for="select-time" class="fieldset">I would like to leave at:</label>
+	<fieldset id="select-time" data-role="controlgroup" data-type="horizontal">
+	<select name="wait-hr" id="wait-hr">
+	   <option value="1">1</option>
+	   <option value="2">2</option>
+	   <option value="3">3</option>
+	   <option value="4">4</option>
+	   <option value="5">5</option>
+	   <option value="6">6</option>
+	   <option value="7">7</option>
+	   <option value="8">8</option>
+	   <option value="9">9</option>
+	   <option value="7">10</option>
+	   <option value="8">11</option>
+	   <option value="9">12</option>
+	</select>
+		<select name="wait-min" id="wait-min">
+	   <option value="1">00</option>
+	   <option value="2">05</option>
+	   <option value="3">10</option>
+	   <option value="4">15</option>
+	   <option value="5">20</option>
+	   <option value="6">25</option>
+	   <option value="7">30</option>
+	   <option value="8">35</option>
+	   <option value="9">40</option>
+	   <option value="7">45</option>
+	   <option value="8">50</option>
+	   <option value="9">55</option>
+	</select>
+	<select name="wait-meridiem" id="wait-meridiem">
+	   <option value="1">AM</option>
+	   <option value="2">PM</option>
+	</select>
+	</fieldset>
+			<select name="wait-day" id="select-hr">
+	   <option value="1">Today</option>
+	   <option value="2">Tomorrow</option>
+	</select>
+	<label for="slider-wait">I'm willing to wait (in minutes):</label>
+   <input type="range" name="slider-wait" id="slider-wait" value="5" min="5" max="180" step="5" />
+	</div>
+	<div data-role="footer" class="ui-bar" data-position="inline">
+	<a href="main.html" data-role="button" data-direction="reverse" data-icon="arrow-l" data-theme="c">Back</a>
+	<button onmouseup="return clickTimeNext()" data-icon="arrow-r" class="ui-btn-right" data-theme="c">Next</button>
+	</div>
+   </div>
+   
+   <div id="map_page" data-role="page">
+   	<div data-role="header" data-position="inline"><div><h3 id="text">Tap desired <b>start</b> location</h3></div></div>
+	<div id="map" data-role="content" style="background-color:black;"><div id="map_canvas"></div></div>
+	<div data-role="footer" class="ui-bar">
+	<button onmouseup="return clickBack()" data-icon="arrow-l" class="ui-btn-left" data-theme="c">Back</button>
+	<button onmouseup="return clickNext()" id="btn_mapnext" data-icon="arrow-r" class="ui-btn-right" data-theme="c">Next</button>
+	</div>
+ </div>
+
+
+ </body>
+</html>

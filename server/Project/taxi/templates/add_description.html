@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block script %}
+<script type="text/javascript">
+    function submitForm() {
+        document.forms["desc_form"].submit();
+    }
+</script>
+{% endblock %}
+
+{% block body %}
+<div id="desc_page" data-role="page">
+  <div id="desc_head" data-role="header" data-position="inline">
+    <h1>Add a description</h1>
+    <a href="/" data-icon="home" data-iconpos="notext" data-direction="reverse"
+       class="ui-btn-left jqm-home">Home</a>
+  </div>
+  <!-- /head -->
+  <div id="desc_content" data-role="content">
+    <form method="POST" id="desc_form" action="/rides/new/">
+      {% csrf_token %}
+	  <label for="description" class="select">Add a short description (max 144
+        characters)
+      </label>
+      <input type="text" name="description" value="" maxlength="144"/>
+    </form>
+  </div>
+  <!-- /content -->
+
+  <div data-position="fixed" data-role="footer" class="ui-bar">
+	<a href="/" data-icon="delete" data-direction="reverse" class="ui-btn-left" data-theme="c">Cancel</a>
+	<button onmouseup="submitForm()" data-icon="arrow-r"
+	        class="ui-btn-right" data-icon="check" data-theme="b">Submit Request</button>
+  </div>
+  <!-- /footer -->
+</div>
+<!-- /desc_page -->
+{% endblock %}

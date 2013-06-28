@@ -1,0 +1,4 @@
+The flow is like this:
+
+- Express.js routes requests of the form
+<dns_name>/<ride_id>/<user_name>/ to 

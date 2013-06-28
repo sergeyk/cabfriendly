@@ -1,0 +1,216 @@
+{% extends "base.html" %}
+
+{% block body %}
+  <div data-role="page">
+  <div data-role="header" data-position="inline"><h1 id="text">Ride Details</h1><a href="/" data-icon="home" data-iconpos="notext" data-direction="reverse" class="ui-btn-left jqm-home">Home</a></div>
+  <div data-role="content">
+   <div>
+   <ul read-only="true" data-role="listview">
+	{% for message in messages %}
+		<li>
+			{{ message|safe }}
+		</li>
+	{% endfor %}
+  <li>
+  {% include 'ride_partial.html' %}
+  </li>
+  </ul>
+   </div>
+  
+  <div data-role="collapsible" data-collapsed="false" data-content-theme="c">
+  <h3>Riders</h3>
+  <ul data-role="listview">
+  	{% for req in ride.requests %}
+      {% include 'rider_partial.html' %}
+    {% endfor %}
+  </ul>
+  </div>
+  <div id="map_div" data-role="collapsible" data-collapsed="false" data-content-theme="c">
+  <h3>Map</h3>
+  <div id="map" data-role="content" ><div style="background-color:black; padding:3px;"><div id="map_canvas" style="height:250px"></div></div></div>
+  <fieldset data-role="controlgroup" data-type="horizontal" >
+	<input onmouseup="return bound_all()" type="radio" name="radio-view" id="radio-view-c" checked="true" value="all"  />
+	<label for="radio-view-c">All</label>
+	<input onmouseup="return bound_start()" type="radio" name="radio-view" id="radio-view-a" value="start"  />
+	<label for="radio-view-a">Meet</label>
+	<input onmouseup="return bound_end()" type="radio" name="radio-view" id="radio-view-b" value="end"  />
+	<label for="radio-view-b">Dests</label>
+  </fieldset>
+  </div>
+  <div data-role="collapsible" data-collapsed="false" data-content-theme="c">
+    <h3>Chat</h3>
+    <!-- {{enc_ride_id}} - {{enc_name}}<br /> -->
+    <iframe src="http://ec2-204-236-138-247.us-west-1.compute.amazonaws.com:3000/{{ride.id}}/{{user.first_name}}/" frameborder="0" border="0" cellspacing="0" style="border-style:none; width:100%; height:120px;"></iframe>
+  </div>
+  </div>
+  <div data-role="footer" data-position="fixed" class="ui-bar">
+	<button onmouseup="parent.location='/rides/search/'" data-icon="arrow-l"
+	        class="ui-btn-left" data-theme="c">Back</button>
+{% if user_in_ride %}
+	<button id="btn_leave" onmouseup="parent.location='/rides/drop/{{ride.id}}/'"
+            data-icon="delete" class="ui-btn-right" data-theme="b">Leave Ride</button>
+{% else %}
+	<button id="btn_join" onmouseup="parent.location='/rides/join/{{ride.id}}'"
+	        data-icon="check" class="ui-btn-right" data-theme="b">Join</button>
+ 
+{% endif %}
+  </div>
+
+  </div>
+  <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?key=AIzaSyBOOrquA1VgO0q7myJdu2FBEJeZF6NJJ90&sensor=true"></script>
+  <script type="text/javascript">
+  
+  var map = null;
+  var meet_mark_img = "{{ STATIC_URL }}meet_marker.png";
+  var start_bubble_img = "http://maps.google.com/intl/en_us/mapfiles/ms/micons/green-dot.png";
+  var start_dot_img = "{{ STATIC_URL }}green_dot.png"
+  var end_bubble_img = "http://maps.google.com/intl/en_us/mapfiles/ms/micons/red-dot.png";
+  var end_dot_img = "{{ STATIC_URL }}red_dot.png" 
+  var usersList = new Array({{ user_names|safe }});
+  var startLatLngList = new Array({{ start_latlongs|join:','}});
+  var endLatLngList = new Array({{ end_latlongs|join:','}});
+  var myStartLatLng = new google.maps.LatLng({{ ride.search_request.start_lat }}, {{ ride.search_request.start_long }})
+  var myEndLatLng = new google.maps.LatLng({{ ride.search_request.end_lat }}, {{ ride.search_request.end_long }})
+  var all_bounds = null;
+  var end_bounds = null;
+  var start_bounds = null;
+  var infoWindow = null;
+  function get_bounds_radius (bounds){
+  		p1 = bounds.getNorthEast();
+  		p2 = bounds.getSouthWest();
+        if (!p1 || !p2) {
+          return 0;
+        }
+
+        var R = 6371; // Radius of the Earth in km
+        var dLat = (p2.lat() - p1.lat()) * Math.PI / 180;
+        var dLon = (p2.lng() - p1.lng()) * Math.PI / 180;
+        var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+          Math.cos(p1.lat() * Math.PI / 180) * Math.cos(p2.lat() * Math.PI / 180) *
+          Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        var d = R * c;
+        return d/2 * 1000;
+  };
+  
+  function load_map() {
+      	
+		var noPOILabels =
+			[{ 
+			  featureType: "poi", 
+			  elementType: "labels", 
+			  stylers: [ { visibility: "off" } ] 
+			}];
+		
+		var noPOIMapType = new google.maps.StyledMapType(noPOILabels, {name: "NO POI"});
+				
+        var mapOptions = 
+        {
+          zoom: 15,
+          continuousZoom: true,
+		  mapTypeIds: [google.maps.MapTypeId.ROADMAP, 'no_poi']
+        };
+        
+        map = new google.maps.Map(document.getElementById('map_canvas'), mapOptions);
+
+	 	map.mapTypes.set('no_poi', noPOIMapType);
+  		map.setMapTypeId('no_poi');
+
+
+  		var meeting_marker = new google.maps.Marker({
+			position: startLatLngList[0],
+			map: map,
+			icon: meet_mark_img,
+			title: "Meeting Point",
+			zIndex: google.maps.Marker.MAX_ZINDEX+3});
+
+	    var start_marker = new google.maps.Marker({
+			position: myStartLatLng, 
+			map: map,
+			icon: start_bubble_img,
+			title: "My Start",
+			zIndex: google.maps.Marker.MAX_ZINDEX+2});
+
+		var end_marker = new google.maps.Marker({
+			position: myEndLatLng, 
+			map: map,
+			icon: end_bubble_img,
+			title: "My Destination",
+			zIndex: google.maps.Marker.MAX_ZINDEX+1});
+        
+        start_bounds = new google.maps.LatLngBounds();
+        end_bounds = new google.maps.LatLngBounds();
+        all_bounds = new google.maps.LatLngBounds();
+
+		for (var i = 0, LtLgLen = usersList.length; i < LtLgLen; i++) {
+			new google.maps.Marker({  
+				icon:start_dot_img,
+				position:startLatLngList[i],
+				map:map
+			});
+       		       		
+			new google.maps.Marker({  
+				icon:end_dot_img,
+				position:endLatLngList[i],
+				map:map
+				});
+
+			end_bounds.extend(endLatLngList[i]);
+			start_bounds.extend(startLatLngList[i]);
+			all_bounds.extend(startLatLngList[i]);
+			all_bounds.extend(endLatLngList[i]);
+		}
+		
+		var r = get_bounds_radius(end_bounds);
+		
+		new google.maps.Circle({  
+			strokeWeight: 1,
+			fillColor: "red",
+			strokeColor: "red",
+			radius: r+25,
+			center: end_bounds.getCenter(),
+			map: map,
+			fillOpacity:0.2
+ 		});
+  		
+  		var r = get_bounds_radius(start_bounds);
+		
+		new google.maps.Circle({  
+			strokeWeight: 1,
+			fillColor: "green",
+			strokeColor: "green",
+			radius: r+10,
+			center: start_bounds.getCenter(),
+			map: map,
+			fillOpacity:0.2
+ 		});			
+ 		
+ 		start_bounds.extend(myStartLatLng);
+ 		end_bounds.extend(myEndLatLng);
+ 		all_bounds.extend(myStartLatLng);
+ 		all_bounds.extend(myEndLatLng);
+		map.fitBounds (all_bounds);
+    	
+      }
+      
+
+  $(document).ready(function () {
+	$('#map_div input:radio').change(function () {
+		var selectedVal = $("#map_div input:radio:checked").val();
+		if(selectedVal == "start")
+		{
+			map.fitBounds (start_bounds);
+		}
+		else if (selectedVal == "end")
+		{
+			map.fitBounds (end_bounds);
+		}
+		else
+		{
+			map.fitBounds (all_bounds);
+		}
+	});
+	 load_map();
+  });
+  </script>
+{% endblock %}
